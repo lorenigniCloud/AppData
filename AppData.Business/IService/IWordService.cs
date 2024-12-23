@@ -9,7 +9,7 @@ namespace AppData.Business.IService;
 
 public interface IWordService
 {
-    public Task<IList<Word>> RetrieveAllAync();
+    public Task<IList<Word>> RetrieveAllAsync();
     public Task<Word?> GetByIdAsync(string id);
     public Task<int?> AddAsync(Word Word);
     public Task<bool?> RemoveAsync(string id);

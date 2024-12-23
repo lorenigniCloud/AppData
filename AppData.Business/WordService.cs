@@ -13,7 +13,7 @@ public class WordService : IWordService
         _wordStorage = wordStorage;
     }
 
-    public async Task<IList<Word>?> RetrieveAllAync()
+    public async Task<IList<Word>?> RetrieveAllAsync()
     {
         return await _wordStorage.RetrieveAllAync();
     }
