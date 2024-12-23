@@ -11,6 +11,9 @@ namespace AppData.Business.IService
     {
         public Task<IdentityUser> FindByEmailAsync(string email);
         public Task<IdentityResult> RegisterUserAsync(IdentityUser user, string password);
+        public Task<bool> CheckPasswordAsync(IdentityUser user, string password);
+        public Task<IList<string>> GetRolesAsync(IdentityUser user);
+
 
     }
 }

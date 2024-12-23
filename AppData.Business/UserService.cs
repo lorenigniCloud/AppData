@@ -22,4 +22,14 @@ public class UserService : IUserService
         return await _userManager.CreateAsync(user, password);
     }
 
+    public async Task<bool> CheckPasswordAsync(IdentityUser user, string password)
+    {
+        return await _userManager.CheckPasswordAsync(user, password);
+    }
+    
+    public async Task<IList<string>> GetRolesAsync(IdentityUser user)
+    {
+        return await _userManager.GetRolesAsync(user);
+    }
+
 }

@@ -1,3 +1,4 @@
+using AppData.API.Extensions;
 using AppData.API.Models;
 using AppData.Business;
 using AppData.Business.IService;
@@ -9,42 +10,44 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Add("role", ClaimTypes.Role);
 
-// Configura l'autenticazione con JWT Bearer
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        //Verifica che il token non sia scaduto.
-//        ValidateLifetime = true,
-//        // Verifica la chiave di firma del token
-//        ValidateIssuerSigningKey = true,
-//        //Verifica che il token sia emesso da un'autorità valida.
-//        ValidIssuer = jwtSettings["Issuer"],
-//        // Se stai sviluppando un'API denominata "MyAPI", potresti impostare ValidAudience su "MyAPI".
-//        ValidAudience = jwtSettings["Audience"],
-//        // Questa chiave è utilizzata per firmare e validare i token JWT, garantendo l'integrità e l'autenticità del token
-//        // Puoi generare una chiave sicura utilizzando un generatore di stringhe casuali o strumenti specifici per la generazione di chiavi.
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-//    };
-//});
-
-builder.Services.AddSingleton<TokenProvider>();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(o =>
+    {
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
+            //Verifica che il token sia emesso da un'autorità valida.
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            // Questa chiave è utilizzata per firmare e validare i token JWT, garantendo l'integrità e l'autenticità del token
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        };
+    });
 
 
 // Configura il contesto del database
@@ -59,15 +62,15 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 // Aggiungi i servizi dell'applicazione
+builder.Services.AddSingleton<TokenProvider>();
 builder.Services.AddScoped<IWordService, WordService>();
 builder.Services.AddScoped<IWordStorage, WordStorage>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-
 // Aggiungi i servizi per i controller e Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithAuth();
 
 var app = builder.Build();
 
@@ -101,10 +104,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 // Aggiungi autenticazione e autorizzazione
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+//app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

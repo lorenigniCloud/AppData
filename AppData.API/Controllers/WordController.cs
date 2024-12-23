@@ -1,5 +1,6 @@
 ﻿using AppData.Business.IService;
 using AppData.Infrastructures.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,24 +14,29 @@ namespace AppData.API.Controllers
     public class WordController : ControllerBase
     {
         private readonly IWordService _wordService;
+        private readonly ILogger<WordController> _logger;
 
-        public WordController(IWordService injectedService)
+
+        public WordController(IWordService injectedService, ILogger<WordController> logger)
         {
             _wordService = injectedService;
+            _logger = logger;
         }
 
         // Accessibile sia dagli utenti che dagli amministratori
         [HttpGet("GetAllWords")]
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Word>>> GetAllWords()
         {
+            _logger.LogInformation("Chiamato endpoint GetAllWords");
             var words = await _wordService.RetrieveAllAsync();
+            _logger.LogInformation($"Restituite {words.Count()} parole");
             return Ok(words);
         }
 
         // Accessibile solo dagli amministratori
         [HttpPost("CreateWord")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<IActionResult> CreateWordAsync([FromBody] Word word)
         {
             if (word == null)
@@ -45,12 +51,13 @@ namespace AppData.API.Controllers
                 return StatusCode(500, "Errore durante la creazione della parola.");
             }
 
-            return CreatedAtAction(nameof(GetWordByIdAsync), new { id = word.Id }, word);
+            //return CreatedAtAction(nameof(GetWordByIdAsync), new { id = word.Id }, word);
+            return Ok(word);
         }
 
         // Accessibile solo dagli amministratori
         [HttpDelete("DeleteWord")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<IActionResult> DeleteWordAsync([FromQuery] string id)
         {
             if (string.IsNullOrEmpty(id))

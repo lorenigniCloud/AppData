@@ -2,6 +2,7 @@
 using AppData.API.Models;
 using AppData.Business.IService;
 using AppData.Infrastructures.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -46,26 +47,34 @@ namespace AppData.API.Controllers
         }
 
 
-        [HttpGet("FindByEmail")]
-        public async Task<string> FindByEmailAsync([FromQuery] string email)
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestModel requestModel)
         {
-            if (string.IsNullOrEmpty(email))
+            // Verifica se il modello di richiesta è valido
+            if (!ModelState.IsValid)
             {
-                return "L'email non può essere vuota.";
+                return BadRequest("Dati di login non validi.");
             }
 
-            var user = await _userService.FindByEmailAsync(email);
-
+            // Cerca l'utente tramite l'email fornita
+            var user = await _userService.FindByEmailAsync(requestModel.Email);
             if (user == null)
             {
-                return "Nessun utente trovato con l'email '{email}'.";
+                return Unauthorized("Credenziali non valide.");
             }
-         
 
-            string result = await _tokenProvider.Create(user);
+            // Verifica la password
+            var passwordValid = await _userService.CheckPasswordAsync(user, requestModel.Password);
+            if (!passwordValid)
+            {
+                return Unauthorized("Credenziali non valide.");
+            }
 
-            return result;
-            
+            // Genera il token JWT
+            var token = await _tokenProvider.CreateTokenAsync(user);
+
+            // Restituisce il token in una risposta di successo
+            return Ok(new { Token = token });
         }
 
 
