@@ -1,6 +1,7 @@
 ﻿using AppData.Business.IService;
 using AppData.Infrastructures.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -87,5 +88,8 @@ namespace AppData.API.Controllers
 
             return Ok(foundWordDB);
         }
+
+
+    
     }
 }
