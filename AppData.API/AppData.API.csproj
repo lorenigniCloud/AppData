@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<BaseOutputPath>C:\VS\trials\AppData\AppData.API\bin\Debug\net8.0</BaseOutputPath>
+		<UserSecretsId>036aba87-65c6-485f-a0c6-10c582928b5a</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,6 +20,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AppData.Business\AppData.Business.csproj" />
+		<ProjectReference Include="..\AppData.EmailSender\AppData.EmailSender.csproj" />
 		<ProjectReference Include="..\AppData.Infrastructures\AppData.Infrastructures.csproj" />
 		<ProjectReference Include="..\AppData.Migrations\AppData.Migrations.csproj" />
 	</ItemGroup>

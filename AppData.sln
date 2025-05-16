@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppData.API", "AppData.API\
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "AppData.SqlServer", "AppData.SqlServer\AppData.SqlServer.sqlproj", "{7750F6AA-2028-4C5A-8602-C7CEA67C85C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppData.Migrations", "AppData.Migrations\AppData.Migrations.csproj", "{4A00323B-AAD8-4D56-93A6-95104748400C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppData.Migrations", "AppData.Migrations\AppData.Migrations.csproj", "{4A00323B-AAD8-4D56-93A6-95104748400C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppData.EmailSender", "AppData.EmailSender\AppData.EmailSender.csproj", "{4921DF6D-5649-4EBB-89EE-6F62A0F5A826}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{4A00323B-AAD8-4D56-93A6-95104748400C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A00323B-AAD8-4D56-93A6-95104748400C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A00323B-AAD8-4D56-93A6-95104748400C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4921DF6D-5649-4EBB-89EE-6F62A0F5A826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4921DF6D-5649-4EBB-89EE-6F62A0F5A826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4921DF6D-5649-4EBB-89EE-6F62A0F5A826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4921DF6D-5649-4EBB-89EE-6F62A0F5A826}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

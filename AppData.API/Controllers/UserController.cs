@@ -2,9 +2,10 @@
 using AppData.API.Models;
 using AppData.Business.IService;
 using AppData.Infrastructures.Entities;
-using Microsoft.AspNetCore.Identity;
+using AppData.EmailSender.Interfaces;
+using AppData.EmailSender.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+
 
 namespace AppData.API.Controllers
 {
@@ -15,11 +16,14 @@ namespace AppData.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly TokenProvider _tokenProvider;
+        protected readonly IEmailSenderService _emailSenderService;
 
-        public UserController(IUserService userService, TokenProvider tokenProvider)
+
+        public UserController(IUserService userService, TokenProvider tokenProvider, IEmailSenderService emailSenderService)
         {
             _userService = userService;
             _tokenProvider = tokenProvider;
+            _emailSenderService = emailSenderService;
         }
 
         // Endpoint per registrare un nuovo utente
@@ -77,6 +81,25 @@ namespace AppData.API.Controllers
             return Ok(new { Token = token });
         }
 
+        [HttpGet("SendEmail")]
+        public async Task<IActionResult> SendEmail(string body, string subject, string email)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Dati di login non validi.");
+            }
+
+            try
+            {
+                await _emailSenderService.SendMailAsync(body, subject, email);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to send email: {ex.Message}");
+            }
+        }
+
 
         //[HttpPost("Handle")]
         //public async Task<IActionResult> Handle([FromBody] RequestModel model)
@@ -103,4 +126,4 @@ namespace AppData.API.Controllers
 
     }
 
-}
+    }

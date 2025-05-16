@@ -13,6 +13,8 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AppData.EmailSender.Extensions;
+using AppData.EmailSender.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,10 +43,10 @@ builder.Services.AddAuthentication(options =>
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ClockSkew = TimeSpan.Zero,
-            //Verifica che il token sia emesso da un'autorità valida.
+            //Verifica che il token sia emesso da un'autoritï¿½ valida.
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
-            // Questa chiave è utilizzata per firmare e validare i token JWT, garantendo l'integrità e l'autenticità del token
+            // Questa chiave ï¿½ utilizzata per firmare e validare i token JWT, garantendo l'integritï¿½ e l'autenticitï¿½ del token
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         };
     });
@@ -55,6 +57,11 @@ builder.Services.AddDbContext<AppDataSqlServerContext>(options =>
 options.UseSqlServer(
         connectionString,
         sqlOptions => sqlOptions.MigrationsAssembly("AppData.Migrations")));
+
+builder.Services.Configure<SmtpConfiguration>(
+    builder.Configuration.GetSection("SmtpConfiguration"));
+
+builder.Services.AddEmailSenderService();
 
 // Configura ASP.NET Core Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -67,10 +74,13 @@ builder.Services.AddScoped<IWordService, WordService>();
 builder.Services.AddScoped<IWordStorage, WordStorage>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+
+
 // Aggiungi i servizi per i controller e Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
+
 
 var app = builder.Build();
 
